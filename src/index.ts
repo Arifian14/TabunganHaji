@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { authRoutes } from "./modules/auth/auth.route";
 import { nasabahRoutes } from "./modules/nasabah/nasabah.route";
 import { tabunganRoutes } from "./modules/tabungan/tabungan.route";
 import { transaksiRoutes } from "./modules/transaksi/transaksi.route";
@@ -23,8 +24,9 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/nasabah", nasabahRoutes);
-app.use("/api/v1/tabungan", tabunganRoutes);
+app.use("/api/v1/tabungan-haji", tabunganRoutes);
 app.use("/api/v1/transaksi", transaksiRoutes);
 
 app.listen(port, () => {

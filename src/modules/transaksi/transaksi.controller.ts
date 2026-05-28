@@ -8,13 +8,18 @@ export const transaksiController = {
     if (!parsed.success) {
       return res.status(400).json({ error: "VALIDATION_ERROR", details: parsed.error.flatten().fieldErrors });
     }
+    const idempotencyKey = req.header('Idempotency-Key')?.trim();
+    if (idempotencyKey !== undefined && (idempotencyKey.length < 8 || idempotencyKey.length > 50)) {
+      return res.status(400).json({ error: 'VALIDATION_ERROR', message: 'Idempotency-Key harus 8-50 karakter' });
+    }
     try {
-      const transaksi = await transaksiService.setor(String(req.params.id), parsed.data);
-      return res.status(201).json(transaksi);
+      const { transaksi, replayed } = await transaksiService.setor(String(req.params.id), parsed.data, idempotencyKey);
+      return res.status(replayed ? 200 : 201).json(transaksi);
     } catch (err) {
       if (err instanceof Error) {
         if (err.message === 'TABUNGAN_NOT_FOUND') return res.status(404).json({ error: 'NOT_FOUND', message: 'Tabungan tidak ditemukan' });
         if (err.message === 'TABUNGAN_NOT_AKTIF') return res.status(422).json({ error: 'TABUNGAN_NOT_AKTIF', message: 'Tabungan tidak dalam status AKTIF' });
+        if (err.message === 'IDEMPOTENCY_CONFLICT') return res.status(409).json({ error: 'IDEMPOTENCY_CONFLICT', message: 'Idempotency-Key sudah dipakai untuk transaksi yang berbeda' });
       }
       throw err;
     }
@@ -50,6 +55,18 @@ export const transaksiController = {
   async findByTabungan(req: Request, res: Response) {
     const data = await transaksiService.findByTabungan(String(req.params.id));
     return res.status(200).json({ data, total: data.length });
+  },
+
+  async mutasi(req: Request, res: Response) {
+    try {
+      const result = await transaksiService.mutasi(String(req.params.id));
+      return res.status(200).json(result);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'TABUNGAN_NOT_FOUND') {
+        return res.status(404).json({ error: 'NOT_FOUND', message: 'Tabungan tidak ditemukan' });
+      }
+      throw err;
+    }
   },
 
   async findById(req: Request, res: Response) {

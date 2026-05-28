@@ -1,9 +1,14 @@
+import bcrypt from "bcrypt";
 import { prisma } from "../../lib/prisma";
 import type { CreateNasabahInput, UpdateNasabahInput } from "./nasabah.schema";
 
+const BCRYPT_ROUNDS = 10;
+
 export const nasabahService = {
-  create: (data: CreateNasabahInput) =>
-    prisma.nasabah.create({ data }),
+  create: async (data: CreateNasabahInput) => {
+    const password = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
+    return prisma.nasabah.create({ data: { ...data, password } });
+  },
 
   findAll: () =>
     prisma.nasabah.findMany({ orderBy: { createdAt: 'desc' } }),

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SetorSchema = z.object({
-  nominal: z.number().int().positive("Nominal harus lebih dari 0"),
+  nominal: z.number().int().min(100_000, "Setoran minimum Rp100.000"),
   metode: z.string().max(20).optional(),
 });
 

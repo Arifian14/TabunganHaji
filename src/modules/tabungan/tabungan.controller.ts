@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client";
-import { CreateTabunganSchema, UpdateStatusSchema } from "./tabungan.schema";
+import { CreateTabunganSchema, UpdateStatusSchema, EstimasiQuerySchema } from "./tabungan.schema";
 import { tabunganService } from "./tabungan.service";
 
 export const tabunganController = {
@@ -16,9 +16,14 @@ export const tabunganController = {
       const tabungan = await tabunganService.create(parsed.data);
       return res.status(201).json(tabungan);
     } catch (err) {
+      if (err instanceof Error) {
+        if (err.message === 'NASABAH_NOT_REGISTERED') return res.status(403).json({ error: 'NASABAH_NOT_REGISTERED', message: 'Nasabah belum terdaftar, tidak dapat membuka rekening' });
+        if (err.message === 'DUPLICATE_TABUNGAN') return res.status(409).json({ error: 'DUPLICATE_TABUNGAN', message: 'Nasabah sudah memiliki rekening tabungan haji' });
+        if (err.message === 'REKENING_GENERATION_FAILED') return res.status(503).json({ error: 'REKENING_GENERATION_FAILED', message: 'Gagal membuat nomor rekening unik, silakan coba lagi' });
+      }
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2002') return res.status(409).json({ error: 'DUPLICATE_ENTRY', message: 'Nomor rekening sudah terdaftar, coba lagi' });
-        if (err.code === 'P2003' || err.code === 'P2025') return res.status(404).json({ error: 'NOT_FOUND', message: 'Nasabah tidak ditemukan' });
+        if (err.code === 'P2003' || err.code === 'P2025') return res.status(403).json({ error: 'NASABAH_NOT_REGISTERED', message: 'Nasabah belum terdaftar, tidak dapat membuka rekening' });
       }
       throw err;
     }
@@ -40,6 +45,22 @@ export const tabunganController = {
   async findByNasabah(req: Request, res: Response) {
     const data = await tabunganService.findByNasabah(String(req.params.nasabahId));
     return res.status(200).json({ data, total: data.length });
+  },
+
+  async estimasi(req: Request, res: Response) {
+    const parsed = EstimasiQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "VALIDATION_ERROR", details: parsed.error.flatten().fieldErrors });
+    }
+    try {
+      const result = await tabunganService.estimasi(String(req.params.id), parsed.data);
+      return res.status(200).json(result);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'NOT_FOUND') {
+        return res.status(404).json({ error: 'NOT_FOUND', message: 'Tabungan tidak ditemukan' });
+      }
+      throw err;
+    }
   },
 
   async updateStatus(req: Request, res: Response) {
