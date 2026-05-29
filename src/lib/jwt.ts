@@ -2,7 +2,7 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import { randomUUID } from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
-const JWT_EXPIRES_SECONDS = Number(process.env.JWT_EXPIRES_SECONDS ?? 3600);
+const JWT_EXPIRES_SECONDS = Number(process.env.JWT_EXPIRES_SECONDS ?? 86400);
 
 export interface TokenPayload {
   sub: string;

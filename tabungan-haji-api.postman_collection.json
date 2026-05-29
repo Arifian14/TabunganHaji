@@ -1,0 +1,447 @@
+{
+  "info": {
+    "name": "Tabungan Haji API",
+    "description": "Koleksi endpoint untuk Tabungan Haji API. Base URL: http://localhost:3000\n\nCara pakai:\n1. Jalankan POST /auth/login → token tersimpan otomatis ke variabel `token`\n2. Semua request yang butuh auth sudah menggunakan variabel `token`\n3. Ganti variabel `nasabah_id`, `tabungan_id`, `transaksi_id` sesuai ID dari response",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token",      "value": "",                     "type": "string" },
+    { "key": "nasabah_id", "value": "",                     "type": "string" },
+    { "key": "tabungan_id","value": "",                     "type": "string" },
+    { "key": "transaksi_id","value": "",                    "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "  pm.collectionVariables.set('token', res.data.accessToken);",
+                  "  console.log('Token saved:', res.data.accessToken.substring(0, 30) + '...');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nasabah@email.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Nasabah",
+      "item": [
+        {
+          "name": "Register Nasabah",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.collectionVariables.set('nasabah_id', res.data.id);",
+                  "  console.log('nasabah_id saved:', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nik\": \"3201234567890001\",\n  \"nama\": \"Budi Santoso\",\n  \"email\": \"nasabah@email.com\",\n  \"nomorHp\": \"081234567890\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/nasabah",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "nasabah"]
+            }
+          }
+        },
+        {
+          "name": "Get All Nasabah",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/nasabah",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "nasabah"]
+            }
+          }
+        },
+        {
+          "name": "Get Nasabah by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/nasabah/{{nasabah_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "nasabah", "{{nasabah_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Nasabah",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",   "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Budi Santoso Updated\",\n  \"nomorHp\": \"082345678901\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/nasabah/{{nasabah_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "nasabah", "{{nasabah_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Nasabah",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/nasabah/{{nasabah_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "nasabah", "{{nasabah_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tabungan Haji",
+      "item": [
+        {
+          "name": "Create Tabungan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.collectionVariables.set('tabungan_id', res.data.id);",
+                  "  console.log('tabungan_id saved:', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",   "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nasabahId\": \"{{nasabah_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji"]
+            }
+          }
+        },
+        {
+          "name": "Get All Tabungan",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji"]
+            }
+          }
+        },
+        {
+          "name": "Get Tabungan by Nasabah ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/nasabah/{{nasabah_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "nasabah", "{{nasabah_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Tabungan by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Estimasi Tabungan",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}/estimasi?kuotaTahunan=221000&nomorPorsi=1000000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}", "estimasi"],
+              "query": [
+                { "key": "kuotaTahunan", "value": "221000",  "description": "Kuota haji per tahun (default: 221000)" },
+                { "key": "nomorPorsi",   "value": "1000000", "description": "Nomor porsi antrian haji (default: 1000000)" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Status Tabungan",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",   "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"AKTIF\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}", "status"]
+            },
+            "description": "Status yang valid: AKTIF | TUTUP | SUSPEND"
+          }
+        },
+        {
+          "name": "Delete Tabungan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}"]
+            },
+            "description": "Hanya bisa dihapus jika saldo = 0 dan tidak ada riwayat transaksi"
+          }
+        },
+        {
+          "name": "Setor Dana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.collectionVariables.set('transaksi_id', res.data.id);",
+                  "  console.log('transaksi_id saved:', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization",  "value": "Bearer {{token}}" },
+              { "key": "Content-Type",    "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "setor-{{$randomUUID}}", "description": "Opsional: mencegah double submit (8-50 karakter)" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nominal\": 500000,\n  \"metode\": \"TRANSFER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}/setor",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}", "setor"]
+            },
+            "description": "Minimal nominal: 100.000. Metode opsional (maks 20 karakter)."
+          }
+        },
+        {
+          "name": "Tarik Dana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.collectionVariables.set('transaksi_id', res.data.id);",
+                  "  console.log('transaksi_id saved:', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",   "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nominal\": 100000,\n  \"metode\": \"TRANSFER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}/tarik",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}", "tarik"]
+            },
+            "description": "Nominal harus bilangan bulat positif dan tidak melebihi saldo."
+          }
+        },
+        {
+          "name": "Get Transaksi by Tabungan",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}/transaksi",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}", "transaksi"]
+            }
+          }
+        },
+        {
+          "name": "Get Mutasi Tabungan",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tabungan-haji/{{tabungan_id}}/mutasi",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tabungan-haji", "{{tabungan_id}}", "mutasi"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transaksi",
+      "item": [
+        {
+          "name": "Get All Transaksi",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/transaksi",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "transaksi"],
+              "query": [
+                { "key": "tabunganId", "value": "",       "description": "Filter by tabungan ID (opsional)", "disabled": true },
+                { "key": "jenis",      "value": "SETOR",  "description": "Filter jenis: SETOR atau TARIK (opsional)", "disabled": true }
+              ]
+            },
+            "description": "Query params opsional:\n- tabunganId: filter berdasarkan tabungan\n- jenis: SETOR atau TARIK"
+          }
+        },
+        {
+          "name": "Get Transaksi by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/transaksi/{{transaksi_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "transaksi", "{{transaksi_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
