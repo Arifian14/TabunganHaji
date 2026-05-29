@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.transaksiRoutes = void 0;
+const express_1 = require("express");
+const transaksi_controller_1 = require("./transaksi.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+exports.transaksiRoutes = (0, express_1.Router)();
+exports.transaksiRoutes.use(auth_middleware_1.requireAuth);
+exports.transaksiRoutes.get("/", transaksi_controller_1.transaksiController.findAll);
+exports.transaksiRoutes.get("/:id", transaksi_controller_1.transaksiController.findById);
