@@ -101,5 +101,6 @@ curl http://localhost:3000/api/v1/tabungan-haji -H "Authorization: Bearer $TOKEN
 - **Belum ada otorisasi kepemilikan/role** — token valid mana pun bisa mengakses rekening
   nasabah mana pun. Belum ada pengecekan `req.auth.id === tabungan.nasabahId` maupun peran
   admin/compliance. Tambahkan bila diperlukan.
-- **`JWT_SECRET` fallback dev** — bila env tidak diset, dipakai `dev-secret-change-me`.
-  **Wajib** set secret kuat untuk selain pengembangan lokal.
+- **`JWT_SECRET` wajib diset** — server akan **gagal start** bila env `JWT_SECRET` tidak ada
+  atau panjangnya kurang dari 32 karakter. Tidak ada fallback dev. Generate secret kuat dengan
+  mis. `openssl rand -hex 48`.

@@ -25,12 +25,18 @@ Dependency runtime: `express`, `@prisma/client`, `prisma`, `zod`, `bcrypt`, `jso
 
 ## 2. Konfigurasi Environment (`.env`)
 
-Buat file `.env` di root proyek:
+Salin `.env.example` menjadi `.env`, lalu isi nilainya:
+
+```bash
+cp .env.example .env
+```
+
+Isi minimal yang dibutuhkan:
 
 ```env
 PORT=3000
 DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/tabungan_haji_online?schema=public
-JWT_SECRET=ganti-dengan-string-acak-panjang
+JWT_SECRET=ganti-dengan-string-acak-minimal-32-karakter
 JWT_EXPIRES_SECONDS=3600
 ```
 
@@ -38,7 +44,7 @@ JWT_EXPIRES_SECONDS=3600
 |---|---|---|
 | `PORT` | tidak | Port server, default `3000` |
 | `DATABASE_URL` | ya | Connection string PostgreSQL |
-| `JWT_SECRET` | ya* | Kunci penandatangan JWT. *Ada fallback dev `dev-secret-change-me`, **wajib diganti** untuk selain dev |
+| `JWT_SECRET` | **ya** | Kunci penandatangan JWT. Minimal 32 karakter. Server **gagal start** kalau tidak diset. |
 | `JWT_EXPIRES_SECONDS` | tidak | Masa berlaku token (detik), default `3600` (1 jam) |
 
 Membuat secret acak:
